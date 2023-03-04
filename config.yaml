@@ -1,0 +1,59 @@
+---
+- hosts: all
+  module_defaults:
+    ansible.builtin.file:
+      pip: pip3
+      python: python3
+  become: true
+  tasks:
+
+  - name: update repository index
+    apt:
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install python3, pip3, and java open-jdk
+    apt:
+      name:
+          - python3
+          - pip
+          - openjdk-8-jdk
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: set python3 as default
+    shell: update-alternatives --install /usr/bin/pyhton python /usr/bin/python>
+
+  - name: set pip3 as default pip
+    shell: update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
+
+  - name: install python3, pip3, and java open-jdk
+    dnf:
+      name:
+        - python3-pip
+        - python3
+        - java-1.8.0-openjdk
+      state: latest
+    when: ansible_distribution == "CentOS"
+
+  - name: set python3 as default
+    ansible.builtin.command: alias python3=/usr/bin/python3
+    when: ansible_distribution == "CentOS"
+
+  - name: MOTD Deployer Defined
+    copy:
+      content: "Ansible Manage Node By ELi Cruz"
+      dest: /etc/motd
+
+  - name: MOTD Default Deployer
+    copy:
+      content: "Ansible Manage Node By ELi Cruz"
+      dest: /etc/motd
+
+  - name: Create user defined
+    ansible.builtin.user:
+      name: Cruz
+      comment: Name
+      uid: 1012
+      createhome: yes
+      home: /home/cruz
